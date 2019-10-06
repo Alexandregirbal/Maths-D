@@ -35,14 +35,50 @@ def liste2(liste):
     return listeResultat
 
 #enumeration() enumere toutes les possibilités de groupes en connaissant le nombre de doublets et de triplets
-def enumeration(doublet,triplet,elements):
+def enumeration(triplet,doublet,dbt,elements,enum):
 
     if ((doublet < 0) or (triplet < 0)):
         return ([])
 
-    enum = []
+    if triplet>0 :
+        t = triplet-1
+        d = doublet
+        perm = liste3(elements)
+        tmp=dbt
+        for i in range(len(perm)):
+            #print("FORt: ",i)
+            tmp.append(perm[i])
+            diff = [k for k in elements]
+            diff.remove(perm[i][0])
+            diff.remove(perm[i][1])
+            diff.remove(perm[i][2])
+            #print(tmp)
+            #print("Il reste :",diff)
+            enumeration(t,d,tmp,diff,enum)
+    elif doublet>0 :
+        t = triplet
+        d = doublet-1
+        perm = liste2(elements)
+        tmp=dbt
+        for j in range(len(perm)):
+            #print("FORd: ",j)
+            #print("perm[j]: ", perm[j])
+            tmp.append(perm[j])
+            #print("tmp:",tmp)
+            diff = [k for k in elements]
+            diff.remove(perm[j][0])
+            diff.remove(perm[j][1])
+            #print("Il reste :",diff)
+            enumeration(t,d,tmp,diff,enum)
+        
+    elif (triplet==0) and (doublet==0):
+        #print("On a fini un set de groupes\n")    
+        enum.append(dbt)
+    
+    print(enum)
+    return (enum)
 
-    for i in range(0,doublet + triplet):
+    '''for i in range(0,doublet + triplet):
         if (triplet > 0):
             perm = liste3(elements)
             for i in range(len(perm)-1):
@@ -54,7 +90,7 @@ def enumeration(doublet,triplet,elements):
                 print(diff)
                 triplet -= 1
                 enumeration(doublet,triplet,diff)
-        elif (doublet > 1):
+        elif (doublet > 0):
             perm = liste2(elements)
             for i in range(len(perm)-1):
                 diff = elements
@@ -66,7 +102,7 @@ def enumeration(doublet,triplet,elements):
         else:   #cas où doublets = 0 ou quand on arrive à doublet == 1 et on a deja traité les triplets
             enum.append(elements)
         
-        return (enum)
+        return (enum)'''
 
 
 def main():
@@ -78,13 +114,15 @@ def main():
     '''
     d = int(input("Calculer les groupes avec ce nombre de doublets: "))
     t = int(input("Calculer les groupes avec ce nombre de triplets: "))
+    print("\n")
     
     listFull = []   #liste qui sera fournie en param d'enum
     taille = 2*d + 3*t
     for i in range(1,taille+1):
         listFull.append(i)
+    dbt = []
     print (listFull)    
-    print (enumeration(d,t,listFull))
+    print (enumeration(t,d,dbt,listFull,[]))
 
 # Et c'est partie !
 
