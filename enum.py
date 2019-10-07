@@ -1,4 +1,4 @@
-#permet de lister toutes les couples possibles pour un nombre entier n
+
 def listeDeux(n):
     listeResultat=[]
     for i in range(1,n+1,1):
@@ -34,7 +34,11 @@ def liste2(liste):
             listeResultat.append([liste[i-1],liste[j-1]])
     return listeResultat
 
-#enumeration() enumere toutes les possibilités de groupes en connaissant le nombre de doublets et de triplets
+ #verifie si une liste de groupes est deja dans la liste finale     
+def verifyDuplication():
+    return (True)
+
+#enumeration() enumere toutes les possibilites de groupes en connaissant le nombre de doublets et de triplets
 def enumeration(triplet,doublet,dbt,elements,enum):
 
     if ((doublet < 0) or (triplet < 0)):
@@ -44,7 +48,7 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet-1
         d = doublet
         perm = liste3(elements)
-        for i in range(len(perm)):
+        for i in range(len(perm)//triplet):
             #print("FORt: ",i)
             tmp = [l for l in dbt]
             tmp.append(perm[i])
@@ -59,7 +63,7 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet
         d = doublet-1
         perm = liste2(elements)
-        for j in range(len(perm)):
+        for j in range(len(perm)//doublet):
             tmp = [l for l in dbt]
             #print("FORd: ",j)
             #print("perm[j]: ", perm[j])
@@ -73,29 +77,33 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         
     elif (triplet==0) and (doublet==0):    
         enum.append(dbt)
-        print("On a fini un set de groupes\n")
+        
         
     #print(enum)
     return (enum)
+
 
 def main():
     '''
     n = int(input("Calculer les permutations possibles pour: "))    
     print(" Permutations de doublets: - -   ", listeDeux(n),"\n")
     print(" Permutations de triplets: - - - ", listeTrois(n),"\n")
-    print(" avec une liste: ", liste2(["Alex","David","Paola","Jerem","Hugo","Audrey"]))
+    print(" avec une liste: ", liste2(test))
     '''
+    testNom = ["Alex","David","Paola","Jerem","Hugo"]
     d = int(input("Calculer les groupes avec ce nombre de doublets: "))
     t = int(input("Calculer les groupes avec ce nombre de triplets: "))
     print("\n")
     
-    listFull = []   #liste qui sera fournie en param d'enum
+    testNum = []
     taille = 2*d + 3*t
     for i in range(1,taille+1):
-        listFull.append(i)
-    dbt = []
-    print (listFull)    
-    print (enumeration(t,d,dbt,listFull,[]))
+        testNum.append(i)
+        
+    dbt = []    
+    res = enumeration(t,d,dbt,testNum,[])
+    print ("Nombre de groupes: ",len(res))
+    print(res)
 
 # Et c'est partie !
 
