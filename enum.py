@@ -1,4 +1,4 @@
-
+#permet de lister toutes les doublets possibles pour un nombre entier n
 def listeDeux(n):
     listeResultat=[]
     for i in range(1,n+1,1):
@@ -15,7 +15,7 @@ def listeTrois(n):
                 listeResultat.append([i,j,k])
     return listeResultat
 
-#prend une liste en argument
+#prend une liste en argument et renvoie tous les triplets poossibles
 def liste3(liste):
     listeResultat=[]
     n = len(liste)
@@ -25,7 +25,7 @@ def liste3(liste):
                 listeResultat.append([liste[i-1],liste[j-1],liste[k-1]])
     return listeResultat
 
-#pareil
+#pareil avec les doublets 
 def liste2(liste):
     listeResultat=[]
     n = len(liste)
@@ -34,10 +34,24 @@ def liste2(liste):
             listeResultat.append([liste[i-1],liste[j-1]])
     return listeResultat
 
- #verifie si une liste de groupes est deja dans la liste finale     
-def verifyDuplication():
-    return (True)
-
+#genere une liste de couples (triplet,doublet) possibles pour un nombre donne n     
+def generateTD(n):
+    res = []
+    if (n<2):
+        return (res)
+    elif (n == 2):
+        return ([0,1])
+    elif (n == 3):
+        return([1,0])
+    else:
+        for i in range((n+2)//2): #pas besoin d'aller plus loin
+            for j in range((n+2)//2):
+                tmp = 3*i + 2*j
+                if (tmp == n):
+                    res.append([i,j])
+        return res
+            
+        
 #enumeration() enumere toutes les possibilites de groupes en connaissant le nombre de doublets et de triplets
 def enumeration(triplet,doublet,dbt,elements,enum):
 
@@ -49,15 +63,13 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         d = doublet
         perm = liste3(elements)
         for i in range(len(perm)//triplet):
-            #print("FORt: ",i)
-            tmp = [l for l in dbt]
+            tmp = [l for l in dbt] #besoin de faire une copie sans lien
             tmp.append(perm[i])
             diff = [k for k in elements]
             diff.remove(perm[i][0])
             diff.remove(perm[i][1])
             diff.remove(perm[i][2])
-            #print(tmp)
-            #print("Il reste :",diff)
+
             enumeration(t,d,tmp,diff,enum)
     elif doublet>0 :
         t = triplet
@@ -65,32 +77,20 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         perm = liste2(elements)
         for j in range(len(perm)//doublet):
             tmp = [l for l in dbt]
-            #print("FORd: ",j)
-            #print("perm[j]: ", perm[j])
             tmp.append(perm[j])
-            #print("tmp:",tmp)
             diff = [k for k in elements]
             diff.remove(perm[j][0])
             diff.remove(perm[j][1])
-            #print("Il reste :",diff)
+
             enumeration(t,d,tmp,diff,enum)
         
     elif (triplet==0) and (doublet==0):    
         enum.append(dbt)
         
-        
-    #print(enum)
     return (enum)
 
-
-def main():
-    '''
-    n = int(input("Calculer les permutations possibles pour: "))    
-    print(" Permutations de doublets: - -   ", listeDeux(n),"\n")
-    print(" Permutations de triplets: - - - ", listeTrois(n),"\n")
-    print(" avec une liste: ", liste2(test))
-    '''
-    testNom = ["Alex","David","Paola","Jerem","Hugo"]
+#Pour tester les fonctions
+def test():
     d = int(input("Calculer les groupes avec ce nombre de doublets: "))
     t = int(input("Calculer les groupes avec ce nombre de triplets: "))
     print("\n")
@@ -105,6 +105,25 @@ def main():
     print ("Nombre de groupes: ",len(res))
     print(res)
 
-# Et c'est partie !
+#Prend en param la liste des elements a classer en groupes
+#Renvoie tous les groupes possibles selon toutes les combinaisons possibles    
+def main(elements):
+    sum = 0
+    t = len(elements)
+    lTD = generateTD(t) # la liste generee des triplets et doublets possibles
+    for i in range(len(lTD)):
+        t = lTD[i][0]
+        d = lTD[i][1]
+        res = enumeration(t,d,[],elements,[])
+        size = len(res)
+        print ("\nNombre de groupes ayant ",t,"triplet(s) et ",d," doublet(s): ",size)
+        print(res)
+        sum += size
+    print("\nNombre total de groupes: ", sum)
+    
+####################################################    
+#let's go hunt
 
-main()
+testNom = ["a","b","c","d","e","f"]
+main(testNom)
+    
