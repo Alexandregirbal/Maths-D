@@ -44,9 +44,9 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet-1
         d = doublet
         perm = liste3(elements)
-        tmp=dbt
         for i in range(len(perm)):
             #print("FORt: ",i)
+            tmp = [l for l in dbt]
             tmp.append(perm[i])
             diff = [k for k in elements]
             diff.remove(perm[i][0])
@@ -59,8 +59,8 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet
         d = doublet-1
         perm = liste2(elements)
-        tmp=dbt
         for j in range(len(perm)):
+            tmp = [l for l in dbt]
             #print("FORd: ",j)
             #print("perm[j]: ", perm[j])
             tmp.append(perm[j])
@@ -71,39 +71,12 @@ def enumeration(triplet,doublet,dbt,elements,enum):
             #print("Il reste :",diff)
             enumeration(t,d,tmp,diff,enum)
         
-    elif (triplet==0) and (doublet==0):
-        #print("On a fini un set de groupes\n")    
+    elif (triplet==0) and (doublet==0):    
         enum.append(dbt)
-    
-    print(enum)
-    return (enum)
-
-    '''for i in range(0,doublet + triplet):
-        if (triplet > 0):
-            perm = liste3(elements)
-            for i in range(len(perm)-1):
-                diff = elements
-                diff.remove(perm[i][0])
-                diff.remove(perm[i][1])
-                diff.remove(perm[i][2])
-                print(elements)
-                print(diff)
-                triplet -= 1
-                enumeration(doublet,triplet,diff)
-        elif (doublet > 0):
-            perm = liste2(elements)
-            for i in range(len(perm)-1):
-                diff = elements
-                diff.remove(perm[i][0])
-                diff.remove(perm[i][1])
-                print(elements)
-                doublet -= 1
-                enumeration(doublet,triplet,diff)
-        else:   #cas où doublets = 0 ou quand on arrive à doublet == 1 et on a deja traité les triplets
-            enum.append(elements)
+        print("On a fini un set de groupes\n")
         
-        return (enum)'''
-
+    #print(enum)
+    return (enum)
 
 def main():
     '''
