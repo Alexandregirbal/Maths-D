@@ -33,6 +33,34 @@ def liste2(liste):
         for j in range(i+1,n+1,1):
             listeResultat.append([liste[i-1],liste[j-1]])
     return listeResultat
+    
+#github Luca
+def estDoublon(solution, listeSolutions):
+    if(len(listeSolutions) == 0):
+        return False
+
+    for solutionTest in listeSolutions:
+
+        nb = 0
+
+        i = 0
+        while (i < len(solution)):
+            trouveCorres = False
+            for groupeSolTest in solutionTest:
+                if (solution[i] == groupeSolTest):
+                    nb += 1
+                    trouveCorres = True
+
+            if (trouveCorres == False):
+                break
+
+            i += 1
+
+        if(nb == len(solution)):
+            print(solution,"=",solutionTest)
+            return True
+
+    return False
 
 #genere une liste de couples (triplet,doublet) possibles pour un nombre donne n     
 def generateTD(n):
@@ -50,7 +78,20 @@ def generateTD(n):
                 if (tmp == n):
                     res.append([i,j])
         return res
-            
+
+def arrondiSup(n):
+    res = n
+    for i in range(n+1):
+        if ((i<n) and (i+1>n)):
+            res = i+1
+    return res
+    
+def arrondiInf(n):
+    res = n
+    for i in range(n+1):
+        if ((i<n) and (i+1>n)):
+            res = i
+    return res
         
 #enumeration() enumere toutes les possibilites de groupes en connaissant le nombre de doublets et de triplets
 def enumeration(triplet,doublet,dbt,elements,enum):
@@ -62,7 +103,10 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet-1
         d = doublet
         perm = liste3(elements)
-        for i in range(len(perm)//triplet):
+        borne = len(perm)
+        if triplet > 1:
+            borne = arrondiInf(len(perm)//triplet)
+        for i in range(borne):
             tmp = [l for l in dbt] #besoin de faire une copie sans lien
             tmp.append(perm[i])
             diff = [k for k in elements]
@@ -75,7 +119,8 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         t = triplet
         d = doublet-1
         perm = liste2(elements)
-        for j in range(len(perm)//doublet):
+        borne = len(perm)//doublet
+        for j in range(borne):
             tmp = [l for l in dbt]
             tmp.append(perm[j])
             diff = [k for k in elements]
@@ -85,6 +130,53 @@ def enumeration(triplet,doublet,dbt,elements,enum):
             enumeration(t,d,tmp,diff,enum)
         
     elif (triplet==0) and (doublet==0):    
+        enum.append(dbt)
+        
+    return (enum)
+    
+def enumDoublets(doublet,dbt,elements,enum):
+
+    if (doublet < 0):
+        return ([])
+
+    elif doublet>0 : 
+        d = doublet-1
+        perm = liste2(elements)
+        borne = len(perm)//doublet
+        for j in range(borne):
+            tmp = [l for l in dbt]
+            tmp.append(perm[j])
+            diff = [k for k in elements]
+            diff.remove(perm[j][0])
+            diff.remove(perm[j][1])
+
+            enumDoublets(d,tmp,diff,enum)
+        
+    elif (doublet==0):    
+        enum.append(dbt)
+        
+    return (enum)
+    
+def enumTriplets(triplet,dbt,elements,enum):
+
+    if (triplet < 0):
+        return ([])
+
+    elif triplet>0 : 
+        t = triplet-1
+        perm = liste3(elements)
+        borne = len(perm)//triplet
+        for j in range(borne):
+            tmp = [l for l in dbt]
+            tmp.append(perm[j])
+            diff = [k for k in elements]
+            diff.remove(perm[j][0])
+            diff.remove(perm[j][1])
+            diff.remove(perm[j][2])
+
+            enumTriplets(t,tmp,diff,enum)
+        
+    elif (triplet==0):    
         enum.append(dbt)
         
     return (enum)
@@ -116,14 +208,19 @@ def main(elements):
         d = lTD[i][1]
         res = enumeration(t,d,[],elements,[])
         size = len(res)
-        print ("\nNombre de groupes ayant ",t,"triplet(s) et ",d," doublet(s): ",size)
+        print ("Nombre de groupes ayant ",t,"triplet(s) et ",d," doublet(s): ",size)
         print(res)
         sum += size
     print("\nNombre total de groupes: ", sum)
     
 ####################################################    
 #let's go hunt
-
-testNom = ["a","b","c","d","e","f"]
-main(testNom)
-    
+test1 = [1,2,3,4,5,6]
+test2 = [1,2,3,4,5,6,7,8]
+testL = ["a","b","c","d","e","f"]
+#main(test1)
+#print(liste2(test1))
+resD = enumDoublets(4,[],test2,[])
+resT = enumTriplets(2,[],test1,[]))
+print(len(resD),resD)
+print(len(resT),resT)
