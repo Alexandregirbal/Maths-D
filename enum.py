@@ -45,13 +45,13 @@ def estDoublon(solution, listeSolutions):
 
         i = 0
         while (i < len(solution)):
-            trouveCorres = False
+            correspondance = False
             for groupeSolTest in solutionTest:
                 if (solution[i] == groupeSolTest):
                     nb += 1
-                    trouveCorres = True
+                    correspondance = True
 
-            if (trouveCorres == False):
+            if (correspondance == False):
                 break
 
             i += 1
@@ -61,6 +61,43 @@ def estDoublon(solution, listeSolutions):
             return True
 
     return False
+
+#les groupes doivent etre ordonnes de la meme facon (1,2 et pas 2,1)
+def listesEgales(a,b):
+    i = 0
+    lena = len(a)
+    lenb = len(b)
+    res = 0
+    if (lena != lenb):
+        return False 
+    while (i < lena):
+        j = 0
+        while (j < lenb):
+            if (a[i] == b[j]):
+                res+=1
+            j+=1
+        i+=1
+    if (res == lena):
+        return True
+
+def suppressionDoublons(liste):
+    i = 0
+    leng = len(liste)
+    unicite = True
+    while (i < leng):
+        toCheck = liste[i]
+        j = i+1
+        while ((j < leng)):
+            if (listesEgales(toCheck,liste[j])):
+                print("Doublon trouve en position: ",j,". On supprime ",liste[j])
+                #print(type([[]]))
+                del liste[j]
+                unicite = False
+                leng = len(liste)
+            j+=1
+        i+=1
+    print("Test unicite: ",unicite) #affiche true si il n'y a pas eu de doublons
+    return liste
 
 #genere une liste de couples (triplet,doublet) possibles pour un nombre donne n     
 def generateTD(n):
@@ -105,7 +142,7 @@ def enumeration(triplet,doublet,dbt,elements,enum):
         perm = liste3(elements)
         borne = len(perm)
         if triplet > 1:
-            borne = arrondiInf(len(perm)//triplet)
+            borne = arrondiInf(len(perm)//2)
         for i in range(borne):
             tmp = [l for l in dbt] #besoin de faire une copie sans lien
             tmp.append(perm[i])
@@ -196,6 +233,9 @@ def test():
     res = enumeration(t,d,dbt,testNum,[])
     print ("Nombre de groupes: ",len(res))
     print(res)
+    
+    test = [[[1,2],[4,5]],[[4,5],[1,2]]]
+    print(suppressionDoublons(test))
 
 #Prend en param la liste des elements a classer en groupes
 #Renvoie tous les groupes possibles selon toutes les combinaisons possibles    
@@ -207,20 +247,35 @@ def main(elements):
         t = lTD[i][0]
         d = lTD[i][1]
         res = enumeration(t,d,[],elements,[])
-        size = len(res)
+        resU = suppressionDoublons(res)
+        size = len(resU)
         print ("Nombre de groupes ayant ",t,"triplet(s) et ",d," doublet(s): ",size)
-        print(res)
         sum += size
     print("\nNombre total de groupes: ", sum)
+    
+def main2(elements):
+    d = len(elements)//2
+    res = enumeration(0,d,[],elements,[])
+    size = len(res)
+    print ("Nombre de groupes ayant ",d," doublet(s): ",size)
+    print(suppressionDoublons(res))
+
+def main3(elements):
+    t = len(elements)//3
+    res = enumeration(t,0,[],elements,[])
+    size = len(res)
+    print ("Nombre de groupes ayant ",t," triplet(s): ",size)
+    print(res)
     
 ####################################################    
 #let's go hunt
 test1 = [1,2,3,4,5,6]
 test2 = [1,2,3,4,5,6,7,8]
 testL = ["a","b","c","d","e","f"]
-#main(test1)
+main(test2)
+#main3(test2)
 #print(liste2(test1))
-resD = enumDoublets(4,[],test2,[])
-resT = enumTriplets(2,[],test1,[]))
-print(len(resD),resD)
-print(len(resT),resT)
+#resD = enumDoublets(4,[],test2,[])
+#resT = enumTriplets(2,[],test1,[]))
+#print(len(resD),resD)
+#print(len(resT),resT)
