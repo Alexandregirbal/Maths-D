@@ -15,20 +15,34 @@ def main(tableauInitial,eleves):
 	return resultat
 
 #fonction qui va generer une nouvelle formation à partir d'une formation originelle(on peut dire que c'est le noeud d'une branche)
-def generer_formation(e1,secondEleves,formation,tableauInitial,res):
-	for i in range(len(secondEleves)):
-		formationI = copie(formation)
-		eleve2 = secondEleves[i]
-		formationI.append([e1,eleve2])
-		#newTableau = del_from_tableauInit(e1,eleve2,tableauInitial) ne marche plus
-		if (len(newTableau) == 0) : #On a tout parcouru
-			res.append(formationI)
-			#return res
-		else :
-			e3 = choix_eleve1(count_appreciations(newTableau))
-			secondEleves4 = trouver_eleves_a_associer(e3,newTableau)
-			generer_formation(e3,secondEleves4,formationI,newTableau,res)
+def generer_formation(formationInit,tableauInitial0,elevesInit,res):
+	tableauInitial = copie(tableauInitial0)
+	#print("__________________DEBUT:",formationInit,tableauInitial,elevesInit,res)
+	e1 = choix_eleve1(tableauInitial,elevesInit)
+	secondEleves = trouver_eleves_a_associer(e1,tableauInitial,elevesInit)
+	#print(secondEleves)
+	#print("voila" ,len(secondEleves))
 
+	for i in range(len(secondEleves)):
+		#print("On entre dans un for avec l'eleve e1 et i ", e1, i)
+		formation = copie(formationInit)
+		#print("sssssssssssssssssssss",secondEleves)
+		eleve2 = secondEleves[i] #[0]
+		#print(eleve2)
+		formation.append([e1,eleve2])
+		elevesETtableau = del_from_tableaux_pref(e1,elevesInit,tableauInitial)
+		elevesETtableau = del_from_tableaux_pref(eleve2,elevesETtableau[0],elevesETtableau[1])
+		#print("elevesETtab",elevesETtableau)
+		if (len(elevesETtableau[0]) == 0) : #On a parcouru tous les eleves
+			#print("\nFINNNNNNNNNNN")
+			res.append(formation)
+			#print ("resultat temporaire:  ",res)
+			return res
+		else : #on reitere sur le reste des eleves
+			#print("\nOn rentre dans le else avec e1", e1)
+			#print("seconde eleve",secondEleves)
+			res =  generer_formation(formation,elevesETtableau[1],elevesETtableau[0],res)
+	#print ("\nreturn final")
 	return res
 
 #compte les appreciations recus par chaque eleve (ex: 0 TB, 1 B, 2 AB, 0 I, 0 P, 1 AR)
@@ -93,11 +107,7 @@ def trouver_eleve_x(comptage,tableauAppreciations,nb_eleves_restants,mention,ele
 
 # trouve le premier eleve (parmis les moins aimes) 
 def choix_eleve1(tableauAppreciations,eleves):
-	"""
-	nb_eleves_restants = len(tableauAppreciations)
-	comptage = count_appreciations(tableauAppreciations)
-	trouver_eleve_x(comptage,tableauAppreciations,nb_eleves_restants,mention,eleves)
-	"""
+	
 	nombre_eleves = len(eleves)
 	tableau_compteur = count_appreciations(tableauAppreciations)
 	eleves_restants = eleves
@@ -105,7 +115,8 @@ def choix_eleve1(tableauAppreciations,eleves):
 
 	#on parcours les mentions en verifiant qu'il ne reste pas un seul eleve (cas le plus simple)
 	while ( i < 6 and len(tableau_compteur) > 1):
-		minimum = tableau_compteur[0][i]
+		indice_min = 0
+		minimum = tableau_compteur[indice_min][i]
 		j = 0
 		#print("min:",minimum)
 		while (j < nombre_eleves ):
@@ -119,8 +130,10 @@ def choix_eleve1(tableauAppreciations,eleves):
 				notChanged = False
 			elif (tableau_compteur[j][i] < minimum) :
 				minimum = tableau_compteur[j][i]
-				j -= 1
-				pre_res = del_from_tableaux(eleves_restants[j],eleves_restants,tableau_compteur)
+				#j -= 1
+				pre_res = del_from_tableaux(eleves_restants[indice_min],eleves_restants,tableau_compteur)
+				indice_min = j
+				#print("on affiche le min et son indice",minimum,j)
 				eleves_restants = pre_res[0]
 				tableau_compteur = pre_res[1]
 				#print("on a trouve un autre min dans le else",tableau_compteur,minimum)
@@ -135,12 +148,12 @@ def choix_eleve1(tableauAppreciations,eleves):
 			nombre_eleves -= 1
 		i += 1
 	eleve_restant = eleves_restants[0]
-	print('On a selectionne le premier eleve: ', eleve_restant)
+	#print('On a selectionne le premier eleve: ', eleve_restant)
 	return eleve_restant
 
-#trouve les eleves à associer a celui entre en parametre         TODO: suppr lui meme des eleves et liste au debut
+#trouve les eleves à associer a celui entre en parametre        
 def trouver_eleves_a_associer(e1,tableau,eleves):
-	print("On cherche a associer un ou plusieurs eleves a", e1)
+	#print("On cherche a associer un ou plusieurs eleves au premier eleve:        ", e1)
 	second_eleves = []
 	indice_e1 = find_indice_eleve(e1,eleves)
 	attributions_e1 = tableau[indice_e1]
@@ -157,17 +170,20 @@ def trouver_eleves_a_associer(e1,tableau,eleves):
 				#on ajoute ceux qui ont mis TB, ou B, ou AB
 				if ((verif_mention_par_indices(i,indice_e1,"TB",tableau) == True) or (verif_mention_par_indices(i,indice_e1,"B",tableau) == True) or (verif_mention_par_indices(i,indice_e1,"AB",tableau) == True)): #je met true pour la visibilite, cf Fiorio le sang
 					second_eleves.append(eleves[i])
+					#print("second_eleves_tmppppp", second_eleves, eleves[i])
 			i += 1
 		if second_eleves != [] : #si on a reussi a trouver qq un :)
+			#print("we did it")
 			notBest = False
 		m += 1
 	if (notBest and m == 6): #AR-AR general
+		#print("personne ne m'aime")
 		tmp = del_from_tableaux(e1,eleves,tableau)
 		eleves2 = tmp[0]
 		tableau2 = tmp[1]
-		print("trouver2:",tableau2,eleves2)
-		second_eleves.append(eleves2)
-	print("On obtient une liste des second_eleves: ", second_eleves)	
+		#print("trouver2:",tableau2,eleves2)
+		second_eleves = eleves2
+	#print("On obtient une liste des second_eleves:                 ", second_eleves)	
 	return second_eleves
 
 #renvoie un booleen pour dire si oui ou non l'eleve 'a' a mis telle mention a l'eleve 'b'
@@ -188,14 +204,48 @@ def del_from_tableaux(e,elevesInit,tableauInit):
 	tableau = copie(tableauInit)
 	indice = find_indice_eleve(e,eleves)
 	del_from_liste(e,eleves)
+	#print(eleves)
 	del tableau[indice]
-	return [eleves,tableau]
+	#print(tableau)
+	return eleves,tableau
+
+#efface toute trace d'un eleve pour la fonction principale
+def del_from_tableaux_pref(e,elevesInit,tableauInit):
+	#print("_____________DELETE with copie _____________________________",elevesInit,tableauInit)
+	eleves = copie(elevesInit)
+	tableauBitch = []
+	for k in range(len(tableauInit)):
+		tableauBitch.append(tableauInit[k])
+	indice = find_indice_eleve(e,eleves)
+	#print("salut",e,eleves)
+
+	del_from_liste(e,eleves)
+	#print("coucou")
+	del tableauBitch[indice]
+	
+	tableauBitch = suppression_indice(tableauBitch,indice)
+	#print("_____________DELETED _____________________________",eleves,tableauBitch)
+	return [eleves,tableauBitch]
+
+def suppression_indice(tableau_a_supprimer,indice):
+	final = []
+	for i in range(len(tableau_a_supprimer)):
+		max = len(tableau_a_supprimer)
+		final.append([])
+		for j in range(len(tableau_a_supprimer)+1):
+			if(j != indice):
+				final[i].append(tableau_a_supprimer[i][j])
+			
+			#print("last chance", final)
+	#print("last chance", final)	
+	return final
 
 #copie une liste dans un autre espace memoire
 def copie(liste):
 	f = []
 	for i in range(len(liste)):
-		f.append(liste[i])
+		a = liste[i]
+		f.append(a)
 	return f
 
 #trouve l'indice d'un eleve
@@ -224,18 +274,21 @@ def testmain(tab,taille,eleves):
 
 #VARIABLES de test
 eleves = [0,1,2,3]
-elevesTest = ["albert1","bernard2","patrick3","alice4"]
+elevesTest = ["albert1","bernard2","patrick3","alice4","Alex","David"]
 
-tabTest = [[-1,"AR","B","AR"],["AR",-1,"B","AB"],["AB","AR",-1,"AR"],["AB","AR","B",-1]]
+tabTest = [[-1,"AR","B","AR","AR","AR"],["AR",-1,"B","AB","AR","AR"],["AB","AR",-1,"AR","AR","AR"],["AB","AR","B",-1,"AR","AR"],["TB","TB","TB","TB",-1,"AR"],["TB","B","B","B","AR",-1]]
 tailleTest = len(tabTest)
 
 e1 = elevesTest[3]
 
 #testmain(tabTest,tailleTest,eleves2)
-print("---tableau:",tabTest)
+print("\n---tableau:",tabTest)
 print("---comptage:",count_appreciations(tabTest))
 print("")
 
-e1 = choix_eleve1(tabTest,elevesTest)
-
-trouver_eleves_a_associer(e1,tabTest,elevesTest)
+#e1 = choix_eleve1(tabTest,elevesTest)
+#print (trouver_eleves_a_associer(e1,tabTest,elevesTest))
+formation = []
+res = []
+#print("c'est parti")
+print(generer_formation(formation,tabTest,elevesTest,res))
