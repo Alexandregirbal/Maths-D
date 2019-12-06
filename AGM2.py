@@ -98,33 +98,56 @@ def choix_eleve1(tableauAppreciations,eleves):
 	comptage = count_appreciations(tableauAppreciations)
 	trouver_eleve_x(comptage,tableauAppreciations,nb_eleves_restants,mention,eleves)
 	"""
-	mention = 0
 	nombre_eleves = len(eleves)
 	tableau_compteur = count_appreciations(tableauAppreciations)
 	eleves_restants = eleves
 	i = 0
 
 	#on parcours les mentions en verifiant qu'il ne reste pas un seul eleve (cas le plus simple)
-	while ( i < 6 and tableau_compteur > 1):
+	while ( i < 6 and len(tableau_compteur) > 1):
 		minimum = tableau_compteur[0][i]
-		for j in range(nombre_eleves):
-			if (minimum < tableau_compteur[j][i]):
+		j = 0
+		#print("min:",minimum)
+		while (j < nombre_eleves ):
+			notChanged = True
+			if (tableau_compteur[j][i] > minimum ):
 				pre_res = del_from_tableaux(eleves_restants[j],eleves_restants,tableau_compteur)
 				eleves_restants = pre_res[0]
 				tableau_compteur = pre_res[1]
+				#print("tableau_compteur du if:",tableau_compteur,minimum)
+				nombre_eleves -= 1
+				notChanged = False
+			elif (tableau_compteur[j][i] < minimum) :
+				minimum = tableau_compteur[j][i]
+				j -= 1
+				pre_res = del_from_tableaux(eleves_restants[j],eleves_restants,tableau_compteur)
+				eleves_restants = pre_res[0]
+				tableau_compteur = pre_res[1]
+				#print("on a trouve un autre min dans le else",tableau_compteur,minimum)
+				nombre_eleves -= 1
+				notChanged = False
+			
+			j += 1
+		if (i == 5  and notChanged): # on fait la meme chose mais on rentre aussi quand on est seul sur cette mention et qu'il reste au moins un autre eleve
+			pre_res = del_from_tableaux(eleves_restants[0],eleves_restants,tableau_compteur)
+			eleves_restants = pre_res[0]
+			tableau_compteur = pre_res[1]
+			nombre_eleves -= 1
 		i += 1
-	choix = randint(0,len(eleves_restants)) #on fait un choix arbitraire pour ne pas avoir trop de possibilites
-	return eleves_restants[choix]
+	eleve_restant = eleves_restants[0]
+	print('On a selectionne le premier eleve: ', eleve_restant)
+	return eleve_restant
 
-#trouve les eleves à associer a celui entre en parametre
-def trouver_eleves_a_associer(e1,tableauInitial,eleves):
+#trouve les eleves à associer a celui entre en parametre         TODO: suppr lui meme des eleves et liste au debut
+def trouver_eleves_a_associer(e1,tableau,eleves):
+	print("On cherche a associer un ou plusieurs eleves a", e1)
 	second_eleves = []
 	indice_e1 = find_indice_eleve(e1,eleves)
-	attributions_e1 = tableauInitial[indice_e1]
+	attributions_e1 = tableau[indice_e1]
 	notBest = True
 
 	#On regarde ceux a qui e1 a mis TB
-	liste_mention = ["TB","B","AB","I","P","AR"]
+	liste_mention = ["TB","B","AB","P","I","AR"]
 	m = 0
 	while (notBest and m < 6):
 		mention = liste_mention[m]
@@ -132,19 +155,19 @@ def trouver_eleves_a_associer(e1,tableauInitial,eleves):
 		while (i < len(eleves)):
 			if attributions_e1[i] == mention :
 				#on ajoute ceux qui ont mis TB, ou B, ou AB
-				if ((verif_mention_par_indices(i,indice_e1,"TB",tableauInitial) == True) or (verif_mention_par_indices(i,indice_e1,"B",tableauInitial) == True) or (verif_mention_par_indices(i,indice_e1,"AB",tableauInitial) == True)): #je met true pour la visibilite, cf Fiorio le sang
+				if ((verif_mention_par_indices(i,indice_e1,"TB",tableau) == True) or (verif_mention_par_indices(i,indice_e1,"B",tableau) == True) or (verif_mention_par_indices(i,indice_e1,"AB",tableau) == True)): #je met true pour la visibilite, cf Fiorio le sang
 					second_eleves.append(eleves[i])
 			i += 1
 		if second_eleves != [] : #si on a reussi a trouver qq un :)
 			notBest = False
 		m += 1
-	if (notBest and m == 6):
-		x = e1
-		while x == e1: # pour ne pas tomber sur lui meme
-			x = eleves[randint(0,len(eleves)-1)]
-		second_eleves = [x] 
-		print("On choisi aleatoirement.")
-	print("second_eleves: ", second_eleves)	
+	if (notBest and m == 6): #AR-AR general
+		tmp = del_from_tableaux(e1,eleves,tableau)
+		eleves2 = tmp[0]
+		tableau2 = tmp[1]
+		print("trouver2:",tableau2,eleves2)
+		second_eleves.append(eleves2)
+	print("On obtient une liste des second_eleves: ", second_eleves)	
 	return second_eleves
 
 #renvoie un booleen pour dire si oui ou non l'eleve 'a' a mis telle mention a l'eleve 'b'
@@ -159,6 +182,7 @@ def del_from_liste(element,liste):
 	liste.remove(element)
 
 #supprime un eleve, cad supprime l'eleves de la liste 'eleves' et supprime son equivalent dans le tableau compteur
+#renvoie une copie
 def del_from_tableaux(e,elevesInit,tableauInit):
 	eleves = copie(elevesInit)
 	tableau = copie(tableauInit)
@@ -202,7 +226,7 @@ def testmain(tab,taille,eleves):
 eleves = [0,1,2,3]
 elevesTest = ["albert1","bernard2","patrick3","alice4"]
 
-tabTest = [[-1,"TB","B","AR"],["AR",-1,"B","AR"],["AB","AR",-1,"AR"],["AB","AR","B",-1]]
+tabTest = [[-1,"AR","B","AR"],["AR",-1,"B","AB"],["AB","AR",-1,"AR"],["AB","AR","B",-1]]
 tailleTest = len(tabTest)
 
 e1 = elevesTest[3]
@@ -210,4 +234,8 @@ e1 = elevesTest[3]
 #testmain(tabTest,tailleTest,eleves2)
 print("---tableau:",tabTest)
 print("---comptage:",count_appreciations(tabTest))
+print("")
+
+e1 = choix_eleve1(tabTest,elevesTest)
+
 trouver_eleves_a_associer(e1,tabTest,elevesTest)
