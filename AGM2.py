@@ -1,17 +1,19 @@
+#!/usr/bin/env python
+# -*-coding: utf-8 -*
+
 import time
 from random import randint
+import csv
+import copy
+import sys
 
-#ne fait rien pour le moment
+# Prend en argument le tableau des appreciations, et la liste des eleves, et renvoie la liste des formations possibles
+# une formation est une possibilite de groupes
 def main(tableauInitial,eleves):
-	resultat = []
-	tableauAppreciations = count_appreciations(tableauInitial)
 	formation = []
-	
-	e1 = choix_eleve1(tableauAppreciations)
-	secondEleves = trouver_eleves_a_associer(e1,tableauInitial)
+	res = []
 
-	resultat = generer_formation(e1,secondEleves,formation,tableauInitial,resultat)
-
+	resultat = 	generer_formation(formation,tableauInitial,eleves,res)
 	return resultat
 
 #fonction qui va generer une nouvelle formation à partir d'une formation originelle(on peut dire que c'est le noeud d'une branche)
@@ -69,41 +71,6 @@ def count_appreciations(tableauAppreciations) :
 			elif (tableauAppreciations[j][i] == "AR") :
 				comptage[i][5] += 1
 	return comptage
-
-"""
-#defini qui a le minimum de bonnes mentions par mention
-def min_bonne_mention(comptage,nb_eleves_restants,mention,eleve):
-	minimum = 100
-	for i in range(0,nb_eleves_restants):
-		if (minimum > comptage[i][mention] and eleve[i] in eleve):
-			minimum = comptage[i][mention]
-	print("min_bonne_mention.minimum&mention:",minimum,mention)
-	return minimum
-
-#permet de verifier si on a des eleves qui ont le meme nombre de mention sur la mention observee
-def verif_egalite_nb_mention(comptage,nb_eleves_restants,mention,minimum,eleve):
-	eleves_mm_nb_mentions = []
-	#j = 0
-	for i in range(0,nb_eleves_restants):
-		print(i)
-		if ((minimum == comptage[i][mention])): #and eleve[i] in eleve):
-			eleves_mm_nb_mentions.append(eleve[i])
-			#j += 1
-			print("verif_egalite_nb_mention.cpteleve:",eleves_mm_nb_mentions)
-	return eleves_mm_nb_mentions   
-
-#trouve le premier eleve
-def trouver_eleve_x(comptage,tableauAppreciations,nb_eleves_restants,mention,eleves):
-    minimum = min_bonne_mention(comptage,nb_eleves_restants,mention,eleves)
-    eleves = verif_egalite_nb_mention(comptage,nb_eleves_restants,mention,minimum,eleves)
-    print("eleves: len=",len(eleves),": ",eleves)
-    if mention == 6 or len(eleves) == 1:
-        return eleves[0]
-    if len(eleves) > 1:
-        mention += 1
-        return trouver_eleve_x(comptage,tableauAppreciations,nb_eleves_restants,mention,eleves)
-        time.sleep(0.1)
-"""
 
 # trouve le premier eleve (parmis les moins aimes) 
 def choix_eleve1(tableauAppreciations,eleves):
@@ -261,34 +228,12 @@ def find_indice_eleve(e,eleves):
 	return indice
 
 ####################################
-
-#permet de tester différentes fonctions
-def testmain(tab,taille,eleves):
-    print("---taille:",taille)
-    print("---tableau: ",tab)
-    print("---comptage:",count_appreciations(tab))
-    print("on affiche le resultat:")
-    #res = trouver_eleve_x(count_appreciations(tab),tab,taille,0,eleves)
-    #print(res)
-    return 0
-
-#VARIABLES de test
-eleves = [0,1,2,3]
+#VARIABLES pour les test
 elevesTest = ["albert1","bernard2","patrick3","alice4","Alex","David"]
-
 tabTest = [[-1,"AR","B","AR","AR","AR"],["AR",-1,"B","AB","AR","AR"],["AB","AR",-1,"AR","AR","AR"],["AB","AR","B",-1,"AR","AR"],["TB","TB","TB","TB",-1,"AR"],["TB","B","B","B","AR",-1]]
-tailleTest = len(tabTest)
-
-e1 = elevesTest[3]
-
-#testmain(tabTest,tailleTest,eleves2)
-print("\n---tableau:",tabTest)
-print("---comptage:",count_appreciations(tabTest))
-print("")
-
-#e1 = choix_eleve1(tabTest,elevesTest)
-#print (trouver_eleves_a_associer(e1,tabTest,elevesTest))
 formation = []
 res = []
-#print("c'est parti")
+
 print(generer_formation(formation,tabTest,elevesTest,res))
+print(main(tabTest,elevesTest))
+####################################
